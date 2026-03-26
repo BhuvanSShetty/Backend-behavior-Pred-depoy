@@ -25,16 +25,31 @@ const startHour = (s) => {
     }).format(date));
 };
 
+// Calendar day key in IST, e.g. "2026-03-27"
+const istDayKey = (dateInput) => {
+    const parts = new Intl.DateTimeFormat('en-IN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        timeZone: 'Asia/Kolkata'
+    }).formatToParts(new Date(dateInput));
+
+    const year = parts.find((p) => p.type === 'year')?.value;
+    const month = parts.find((p) => p.type === 'month')?.value;
+    const day = parts.find((p) => p.type === 'day')?.value;
+    return `${year}-${month}-${day}`;
+};
+
 // ── feature 8: trend ─────────────────────────────────────────────────────────
 // Sum durations per calendar day across weekSessions, then:
 //   trend = today_total − total_of_oldest_day_in_window
 const computeTrend = (allSessionsThisWeek, todayTotalTime) => {
     if (allSessionsThisWeek.length === 0) return 0;
 
-    // Group by date string "YYYY-MM-DD"
+    // Group by IST calendar day "YYYY-MM-DD"
     const byDay = {};
     for (const s of allSessionsThisWeek) {
-        const day = new Date(s.start).toISOString().slice(0, 10);
+        const day = istDayKey(s.start);
         byDay[day] = (byDay[day] || 0) + s.duration;
     }
 
