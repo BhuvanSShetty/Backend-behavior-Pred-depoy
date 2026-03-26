@@ -15,8 +15,15 @@ const sortedByStart = (sessions) =>
 const gapMinutes = (a, b) =>
     (new Date(b.start) - new Date(a.end)) / 60_000;
 
-// Hour (0-23) that a session started
-const startHour = (s) => new Date(s.start).getHours();
+// Hour (0-23) that a session started in IST (Asia/Kolkata timezone)
+const startHour = (s) => {
+    const date = new Date(s.start);
+    return Number(new Intl.DateTimeFormat('en-IN', {
+        hour: 'numeric',
+        hour12: false,
+        timeZone: 'Asia/Kolkata'
+    }).format(date));
+};
 
 // ── feature 8: trend ─────────────────────────────────────────────────────────
 // Sum durations per calendar day across weekSessions, then:
